@@ -8,13 +8,12 @@ package interfaz;
 import agenda.Agenda;
 import agenda.Contacto;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.ListModel;
+import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -25,34 +24,38 @@ public class JframeContacto extends javax.swing.JFrame {
     /**
      * Creates new form JframeInicio
      */
-  DefaultListModel<String> model = new DefaultListModel<>(); 
+    DefaultListModel<String> model = new DefaultListModel<>(); 
+    private Contacto conct=new Contacto();
+    private Agenda agen;
+    private String ruta;
     
-     public void setJlabel(String nomb){
-         jLabelNombre.setText(nomb);
-     }
+   public DefaultListModel modelList() throws FileNotFoundException {
+   
      
-     
-   public DefaultListModel modelList(String nombre) throws FileNotFoundException {
-       
-      
-        Agenda agen=new Agenda("C:\\Users\\kanutto\\Documents\\NetBeansProjects\\AGENDA\\Agenda.txt");
-        for(Contacto c:agen.getListaContactos()){
-            if(c.getNombre().equalsIgnoreCase(nombre)) 
-                for(Integer tel:c.getTelefono())
-                    model.addElement(Integer.toString(tel));
-           System.out.println(c.getNombre());
-        }
-        
-     
+        for(Integer tel:conct.getTelefono())
+         model.addElement(Integer.toString(tel));
+    
         return model;
     }
-    
-    public JframeContacto() throws FileNotFoundException {
+   public JframeContacto() throws FileNotFoundException{
         initComponents();
-
-
+        this.setVisible(true);
+        this.setExtendedState(6); 
        
-        jListTelefonos.setModel(model);
+        
+   }
+    
+    public JframeContacto(Contacto co,String ruta) throws FileNotFoundException {
+       
+        this.agen = new Agenda(ruta);
+        initComponents();
+        this.ruta=ruta;
+        conct=co;
+        this.setVisible(true);
+        this.setExtendedState(6);
+        jLabelNombre.setText(conct.getNombre());
+        jListTelefonos.setModel(modelList());
+       
     }
 
     /**
@@ -79,31 +82,87 @@ public class JframeContacto extends javax.swing.JFrame {
         jLabelLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo1.png"))); // NOI18N
         getContentPane().add(jLabelLogo, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, -1, -1));
 
-        jLabelNombre.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        getContentPane().add(jLabelNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 220, -1, -1));
+        jLabelNombre.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        getContentPane().add(jLabelNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 240, 350, 30));
 
-        jListTelefonos.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jListTelefonos.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jScrollPanel.setViewportView(jListTelefonos);
 
-        getContentPane().add(jScrollPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 300, 350, -1));
+        getContentPane().add(jScrollPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 290, 350, 140));
 
         jButtonEditar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonEditar.setText("Editar");
-        getContentPane().add(jButtonEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 290, -1, -1));
+        jButtonEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEditarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(875, 290, 110, -1));
 
         jButtonEliminar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButtonEliminar.setText("Eliminar");
+        jButtonEliminar.setText("<html> <p align=\"center\">Eliminar</p> <p align=\"center\">Tlf</p> <html> ");
+        jButtonEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEliminarActionPerformed(evt);
+            }
+        });
         getContentPane().add(jButtonEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 340, -1, -1));
 
         jButtonCancelar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButtonCancelar.setText("Cancelar");
-        getContentPane().add(jButtonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 400, -1, -1));
+        jButtonCancelar.setText("Volver");
+        jButtonCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 400, 110, -1));
 
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/62863877-red-white-wallpapers.jpg"))); // NOI18N
         getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminarActionPerformed
+     int n = JOptionPane.showConfirmDialog( null,"¿Estás seguro que desea eliminar?" ,"Eliminar Telefono", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+     if(n==JOptionPane.YES_OPTION){
+        int i = jListTelefonos.getSelectedIndex();
+        model.remove(i);
+
+        agen.eliminarTelefono(conct.getNombre(), conct.getTelefono().get(i));
+        conct.getTelefono().remove(i);
+           try {
+               agen.guardarDatos();
+           } catch (IOException ex) {
+               Logger.getLogger(JframeContacto.class.getName()).log(Level.SEVERE, null, ex);
+           }
+           
+     }
+    }//GEN-LAST:event_jButtonEliminarActionPerformed
+
+    private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
+        
+        try {
+            JframeInicio volver=new JframeInicio();
+            volver.setVisible(true);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(JframeContacto.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        JframeContacto.this.dispose();
+        
+    }//GEN-LAST:event_jButtonCancelarActionPerformed
+
+    private void jButtonEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditarActionPerformed
+       
+         try {
+            JframeEditar editar=new JframeEditar(conct,ruta);
+            editar.setVisible(true);
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(JframeContacto.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        JframeContacto.this.dispose();
+    }//GEN-LAST:event_jButtonEditarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -135,16 +194,18 @@ public class JframeContacto extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                
+            
                 try {
                     new JframeContacto().setVisible(true);
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(JframeContacto.class.getName()).log(Level.SEVERE, null, ex);
                 }
+               
                
                   
             }

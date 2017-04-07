@@ -35,7 +35,38 @@ public class Agenda {
          contador_contactos=0;
  
     }
-     
+    public void exportar(File fich) throws IOException{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(fich+".csv"));  
+        for(Contacto con:lista_contactos){
+            bw.write(con.getNombre()+",");
+            for(Integer tel:con.getTelefono())
+                bw.write(tel+",");
+            bw.write("\r\n");
+        }
+       bw.close();
+    }
+    
+    public void importar(File fich) throws IOException{
+       
+        try {
+            FileReader fr = new FileReader(fich);
+            BufferedReader br = new BufferedReader(fr);
+            String linea;
+            while((linea = br.readLine()) != null){
+                String[] trozos=linea.split(",");
+                for(int i=1;i<trozos.length;i++)
+                    this.Anadir(trozos[0],Integer.parseInt(trozos[i]));              
+            }
+            fr.close();
+        }
+        catch(Exception e) {
+            System.out.println("Excepcion leyendo fichero ");
+        }
+  
+        
+    }
+        
+    
     public void guardarDatos() throws IOException{
         String sFichero = "Agenda.txt";
         File fichero = new File(sFichero);
@@ -50,8 +81,6 @@ public class Agenda {
     }
     
     public void cargarDatos(String ruta) throws FileNotFoundException {
-        List<Contacto> con = new ArrayList<>();
-       
         try {
             FileReader fr = new FileReader(ruta);
             BufferedReader br = new BufferedReader(fr);
@@ -77,9 +106,23 @@ public class Agenda {
   
     }
 
-    
+    public Contacto buscarContacto(String nombre){
+       
+        for(int i=0;i<lista_contactos.size();i++){
+            if(lista_contactos.get(i).getNombre().equalsIgnoreCase(nombre))
+                return lista_contactos.get(i);
+        }
+        return null;
+    }
 
-    public boolean topeMinimo(int telefono){
+    
+    public void eliminarTelefono(String nombre,int telefono){
+        Contacto con=buscarContacto(nombre);
+        con.eliminarTelefono(telefono);
+                
+    }
+    
+    private boolean topeMinimo(int telefono){
         String valor=Integer.toString(telefono);
         if(valor.length()>=3){
             return true;
@@ -87,7 +130,7 @@ public class Agenda {
         return false;
     }
     
-    public boolean topeMaximo(int telefono){
+    private boolean topeMaximo(int telefono){
         String valor=Integer.toString(telefono);
         if(valor.length()<=10){
             return true;
@@ -100,7 +143,7 @@ public class Agenda {
             if (nombre.equals(con.getNombre())) {
                 for(Integer tel:con.getTelefono()){
                     if(tel==telefono){
-                       System.out.println("Ya existe un contacto con ese nombre");
+                       //System.out.println("Ya existe un contacto con ese nombre");
                        return true;
                     }
                    
@@ -135,11 +178,11 @@ public class Agenda {
                 this.contador_contactos++;
                 Ordenar();
                 }
-             this.guardarDatos();
+           
             }
 
         } else{
-          System.out.println("El telefono no es valido");
+         // System.out.println("El telefono no es valido");
         }
     }
 
@@ -148,12 +191,12 @@ public class Agenda {
 
         for (Contacto con: this.lista_contactos){
             if (nombre.equalsIgnoreCase(con.getNombre())) {
-                System.out.println(con.getNombre() + "-" + "Tf:" + con.getTelefono());
+                //System.out.println(con.getNombre() + "-" + "Tf:" + con.getTelefono());
                 encontrado = true;
             }
         }
         if (!encontrado) {
-            System.out.println("Contacto inexistente");
+            //System.out.println("Contacto inexistente");
         }
         return encontrado;
     }
@@ -175,11 +218,11 @@ public class Agenda {
 
     public void Mostrar() {
         if (this.contador_contactos == 0) {
-            System.out.println("No hay contactos");
+           System.out.println("No hay contactos");
         } else {
             for(Contacto con:this.lista_contactos) {
                 // Es necesario por precaución usar el this para el metodo, puesto que si se ejecuta muchas veces la referencias a memoria pueden fallar.
-                System.out.println(con.getNombre() + "-" + "Tfs:");
+                //System.out.println(con.getNombre() + "-" + "Tfs:");
                 con.MostrarTel();
             }
         }
@@ -189,106 +232,84 @@ public class Agenda {
         return this.lista_contactos;
     }
     public void Vaciar() {
-        try {
-            System.out.println("Se eliminarán todos los contactos");
-            System.out.println("¿Estas seguro (S/N)?");
-            String respuesta;
-            BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
-            respuesta = teclado.readLine();
-            respuesta = respuesta.toUpperCase();
-            if (respuesta.equals("S")) {
-
-                //Lo hago por mera formalidad porque java se encarga de liberar los objetos no referenciados creados. El garbage collector
-                this.lista_contactos.removeAll(lista_contactos);
-                contador_contactos = 0;
-                System.out.println("Agenda vaciada correctamente");
-            } else {
-                System.out.println("Acción cancelada");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Agenda.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //Lo hago por mera formalidad porque java se encarga de liberar los objetos no referenciados creados. El garbage collector
+        this.lista_contactos.removeAll(lista_contactos);
+        contador_contactos = 0;
+        //System.out.println("Agenda vaciada correctamente");
 
     }
 
-    public void Eliminar() {
-        try {
-            boolean encontrado = false;
-            BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Nombre de contacto a eliminar:");
-            String eliminar = teclado.readLine().toUpperCase();
-            if (contador_contactos == 0) {
-                System.out.println("No hay contactos");
-            } else {
-                    int i=0;
-                for(Contacto con:this.lista_contactos){
-                    i+=1;
-                    if (eliminar.equals(con.getNombre())) {
-                        System.out.println(con.getNombre() + "-" + "Tf:" + con.getTelefono());
-                        encontrado = true;
-                    }
-                }
-                if (encontrado) {
- 
-                    System.out.println("¿Estas seguro (S/N)?");
-                    String respuesta;
-                    respuesta = teclado.readLine();
-                    respuesta = respuesta.toUpperCase();
-                    if (respuesta.equals("S")) {
-                        
-                       lista_contactos.remove(i);
-                       this.contador_contactos--;
-                       System.out.println("Contacto eliminado correctamente");
-                       
 
-                    }
-
-                } else {
-                    System.out.println("Lo siento, No se ha encontrado el nombre");
+    public void EliminarContacto(String nombre) {
+        boolean encontrado = false;
+        
+        if (contador_contactos == 0) {
+            //System.out.println("No hay contactos");
+        } else {
+            int i=0;
+            for(Contacto con:this.lista_contactos){
+                
+                if (nombre.equals(con.getNombre())) {
+                   // System.out.println(con.getNombre() + "-" + "Tf:" + con.getTelefono());
+                    encontrado = true;
+                    break;
                 }
+                i+=1;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Agenda.class.getName()).log(Level.SEVERE, null, ex);
+            if (encontrado) {
+                
+                
+                lista_contactos.remove(i);
+                this.contador_contactos--;
+                //System.out.println("Contacto eliminado correctamente");
+                
+                
+                
+                
+            } else {
+                //System.out.println("Lo siento, No se ha encontrado el nombre");
+            }
         }
     }
 
-    public void Modificar() {
-        try {
-            boolean encontrado = false;
-            BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Nombre de contacto a modificar:");
-            String eliminar = teclado.readLine().toUpperCase();
-            if (contador_contactos == 0) {
-                System.out.println("No hay contactos");
-            } else {
-                int i=0;
-                for (Contacto con:lista_contactos) {
-                    i+=1;
-                    if (eliminar.equals(con.getNombre())) {
-                        System.out.println(con.getNombre() + "-" + "Tf:");
-                        con.MostrarTel();
-                        
-                        encontrado = true;
-                        
-                    }
-                }
-                if (encontrado) {
-                    System.out.println("Introduce nombre:");
-                    String nombre_nuevo = teclado.readLine(); 
-                    System.out.println("Introduce telefono a modificar:");
-                    int telefono = Integer.parseInt(teclado.readLine());
-                    System.out.println("Introduce teléfono, formato numerico:");
-                    int telefono_nuevo = Integer.parseInt(teclado.readLine());
-                    this.lista_contactos.get(i).set_nombre(nombre_nuevo);
-                    this.lista_contactos.get(i).set_telefono(telefono,telefono_nuevo);
+    
+  
+    public Contacto Modificar(String nombreOrigen,int telefonoOrigen, int telefono) {
+        boolean encontrado = false;
+       
+        if (contador_contactos == 0) {
+           // System.out.println("No hay contactos");
+        } else {
+            int i=0;
+            for (Contacto con:lista_contactos) {
+                
+                if (nombreOrigen.equals(con.getNombre())) {
+                   // System.out.println(con.getNombre() + "-" + "Tf:");
+                    con.MostrarTel();
                     
-                } else {
-                    System.out.println("No hay contactos con ese nombre");
+                    encontrado = true;
+                    break;
+                    
                 }
-
+                i+=1;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Agenda.class.getName()).log(Level.SEVERE, null, ex);
+            if (encontrado) {
+                
+                this.lista_contactos.get(i).set_telefono(telefonoOrigen,telefono);
+                return this.lista_contactos.get(i);
+                
+            } else {
+               // System.out.println("No hay contactos con ese nombre");
+            }
+            
         }
+        return null;
     }
+
+    public void cargarDatos(File abre) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
 }
