@@ -20,7 +20,7 @@ public class Contacto {
         this.telefono.add(telefono);
     }
     public void set_nombre(String nomb){        
-        this.nombre=nomb.toUpperCase();
+        this.nombre=nomb;
     }
 
     public String getNombre() {
@@ -32,13 +32,30 @@ public class Contacto {
     }
     
     public void set_telefono(int tl, int nuevo){
+        int i=0;
         for(Integer tle:telefono){
-            if(tle==tl)
-                tle=nuevo;
-                break;
+            if(tle==tl){
+              telefono.set(i, nuevo);
+              break;
+            }
+            i+=1;
             
         }
       
+    }
+    
+    public int buscarTelefono(int tel){
+        for(int i=0;i<=telefono.size();i++ ){
+            if(telefono.get(i).equals(tel))
+                return i;
+        }
+       return -1;
+    }
+    
+    public void eliminarTelefono(int tel){
+        int val=buscarTelefono(tel);
+        if(val!=-1)
+            telefono.remove(val);
     }
     
     public void aniadirTelefono(int tel){

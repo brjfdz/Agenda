@@ -9,9 +9,11 @@ import agenda.Agenda;
 import agenda.Contacto;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+
 import javax.swing.JOptionPane;
 
 
@@ -19,42 +21,41 @@ import javax.swing.JOptionPane;
  *
  * @author kanutto
  */
-public class JframeAñadir extends javax.swing.JFrame {
+public class JframeEditar extends javax.swing.JFrame {
 
     /**
      * Creates new form JframeInicio
      */
-  
-    DefaultListModel<String> model = new DefaultListModel<>(); 
-    Agenda agenda;
-    boolean bol=false;
+   private Contacto cont=new Contacto();
+   private DefaultListModel<String> model = new DefaultListModel<>(); 
+   private Agenda agenda;
     
-   private DefaultListModel modelList(String telefono) throws FileNotFoundException, IOException {
-       
-       if(!model.contains(telefono)){
-           model.addElement(telefono);
-       }
-        
+    public DefaultListModel modelList() throws FileNotFoundException {
+   
      
+        for(Integer tel:cont.getTelefono())
+         model.addElement(Integer.toString(tel));
+    
         return model;
     }
 
    
-    public JframeAñadir() throws FileNotFoundException   {
+    public JframeEditar() throws FileNotFoundException   {
         initComponents();
         this.setVisible(true);
         this.setExtendedState(6); 
-     
-    
     }
     
-    public JframeAñadir(String ruta) throws FileNotFoundException   {
+     public JframeEditar(Contacto co,String ruta) throws FileNotFoundException   {
+     this.agenda = new Agenda(ruta);
         initComponents();
         this.setVisible(true);
         this.setExtendedState(6); 
-        agenda=new Agenda(ruta);
-    
-    }
+        cont=co;
+        
+        jTextFieldNombre.setText(cont.getNombre());
+        jListTelefonos.setModel(modelList());
+     }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -75,8 +76,8 @@ public class JframeAñadir extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextFieldTelefono = new javax.swing.JTextField();
         jButtonGuardar = new javax.swing.JButton();
-        jButtonBorrar = new javax.swing.JButton();
         jButtonCancelar = new javax.swing.JButton();
+        jButtonSeleccionar = new javax.swing.JButton();
         jLabelFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -115,11 +116,6 @@ public class JframeAñadir extends javax.swing.JFrame {
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, -1, -1));
 
         jTextFieldTelefono.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jTextFieldTelefono.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTextFieldTelefonoMouseClicked(evt);
-            }
-        });
         getContentPane().add(jTextFieldTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 320, 220, -1));
 
         jButtonGuardar.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
@@ -131,15 +127,6 @@ public class JframeAñadir extends javax.swing.JFrame {
         });
         getContentPane().add(jButtonGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1100, 520, -1, -1));
 
-        jButtonBorrar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButtonBorrar.setText("Borrar");
-        jButtonBorrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonBorrarActionPerformed(evt);
-            }
-        });
-        getContentPane().add(jButtonBorrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 200, -1, -1));
-
         jButtonCancelar.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonCancelar.setText("Cancelar");
         jButtonCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -149,6 +136,15 @@ public class JframeAñadir extends javax.swing.JFrame {
         });
         getContentPane().add(jButtonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 520, -1, -1));
 
+        jButtonSeleccionar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonSeleccionar.setText("Seleccionar");
+        jButtonSeleccionar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSeleccionarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonSeleccionar, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 200, -1, -1));
+
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/62863877-red-white-wallpapers.jpg"))); // NOI18N
         getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, -1));
 
@@ -156,56 +152,55 @@ public class JframeAñadir extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAñadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAñadirActionPerformed
+        int i=jListTelefonos.getSelectedIndex();
         String tele=jTextFieldTelefono.getText();
         if((tele.length()>=3)&&(tele.length()<=12)){
-            try {
-                modelList(jTextFieldTelefono.getText());
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(JframeAñadir.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(JframeAñadir.class.getName()).log(Level.SEVERE, null, ex);
+            if(!jTextFieldNombre.getText().equals(model.get(i))){
+                cont=agenda.Modificar(cont.getNombre(),Integer.parseInt(model.get(i)),Integer.parseInt(tele));
+                model.removeAllElements();
+                try {
+                    jListTelefonos.setModel(modelList());
+                    jTextFieldTelefono.setText("");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JframeEditar.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }else{
+                
+                jTextFieldNombre.setText(jTextFieldTelefono.getText());
+                cont=agenda.Modificar(cont.getNombre(),Integer.parseInt(model.get(i)),Integer.parseInt(tele));
+                model.removeAllElements();
+                try {
+                    jListTelefonos.setModel(modelList());
+                    jTextFieldTelefono.setText("");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JframeEditar.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            jListTelefonos.setModel(model);
-            jTextFieldTelefono.setText("");
-       }
-        else {
+        }else {
              JOptionPane.showMessageDialog(null,  "El numero de telefono no es valido", "Mensaje de Error", JOptionPane.ERROR_MESSAGE); 
 
         }
-        
     }//GEN-LAST:event_jButtonAñadirActionPerformed
 
     private void jButtonGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarActionPerformed
         try {
-            String nomb=jTextFieldNombre.getText();
-           if(jTextFieldNombre.getText().equals("")){
-               nomb=model.get(0);
-               
-           }
-            for(int i=0; i<model.size();i++)
-                 agenda.Anadir(nomb, Integer.parseInt(model.get(i)));
-                
-                
+            agenda.EliminarContacto(cont.getNombre());
+            cont.set_nombre(jTextFieldNombre.getText());
+            for(int tel:cont.getTelefono())
+                agenda.Anadir(cont.getNombre(),tel);
+           
             agenda.guardarDatos();
-            JframeInicio volver=new JframeInicio();
+            JframeInicio volver=new JframeInicio(agenda);
             volver.setVisible(true);
-            JframeAñadir.this.dispose();
+            JframeEditar.this.dispose();
         } catch (IOException ex) {
-            Logger.getLogger(JframeAñadir.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JframeEditar.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         
         
         
     }//GEN-LAST:event_jButtonGuardarActionPerformed
-
-    private void jButtonBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBorrarActionPerformed
-    int n = JOptionPane.showConfirmDialog( null,"¿Estás seguro que desea eliminar?" ,"Eliminar Telefono", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-     if(n==JOptionPane.YES_OPTION){
-        int i = jListTelefonos.getSelectedIndex();
-        model.remove(i);
-     }
-    }//GEN-LAST:event_jButtonBorrarActionPerformed
 
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
     try {
@@ -214,28 +209,15 @@ public class JframeAñadir extends javax.swing.JFrame {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JframeContacto.class.getName()).log(Level.SEVERE, null, ex);
         }
-        JframeAñadir.this.dispose();
+        JframeEditar.this.dispose();
         
     }//GEN-LAST:event_jButtonCancelarActionPerformed
 
-    private void jTextFieldTelefonoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextFieldTelefonoMouseClicked
-      Contacto co=agenda.buscarContacto(jTextFieldNombre.getText());
-      if(co!=null){
-          JOptionPane.showMessageDialog( null,"El contacto ya existe" ,"Contacto Existente",JOptionPane.WARNING_MESSAGE);
-            for(int tel:co.getTelefono()){
-               if(!model.contains(Integer.toString(tel)))
-                    model.addElement(Integer.toString(tel));
-              }
-             jListTelefonos.setModel(model);
-             bol=true;
-      }else {
-          if(bol){
-             model.removeAllElements();
-             jListTelefonos.setModel(model);
-             bol=false;
-          }
-      }
-    }//GEN-LAST:event_jTextFieldTelefonoMouseClicked
+    private void jButtonSeleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionarActionPerformed
+     int i=jListTelefonos.getSelectedIndex();
+     jTextFieldTelefono.setText(model.get(i));
+     
+    }//GEN-LAST:event_jButtonSeleccionarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -257,14 +239,16 @@ public class JframeAñadir extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JframeAñadir.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JframeEditar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JframeAñadir.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JframeEditar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JframeAñadir.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JframeEditar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JframeAñadir.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JframeEditar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -273,9 +257,9 @@ public class JframeAñadir extends javax.swing.JFrame {
             public void run() {
                
                 try {
-                    new JframeAñadir().setVisible(true);
+                    new JframeEditar().setVisible(true);
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(JframeAñadir.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JframeEditar.class.getName()).log(Level.SEVERE, null, ex);
                 }
                
                   
@@ -288,9 +272,9 @@ public class JframeAñadir extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAñadir;
-    private javax.swing.JButton jButtonBorrar;
     private javax.swing.JButton jButtonCancelar;
     private javax.swing.JButton jButtonGuardar;
+    private javax.swing.JButton jButtonSeleccionar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

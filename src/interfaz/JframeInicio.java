@@ -7,14 +7,18 @@ package interfaz;
 
 import agenda.Agenda;
 import agenda.Contacto;
+import com.sun.glass.events.KeyEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.ListModel;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -25,15 +29,12 @@ public class JframeInicio extends javax.swing.JFrame {
     /**
      * Creates new form JframeInicio
      */
-    private String nombre=null;
-    DefaultListModel<String> model = new DefaultListModel<>(); 
-    
+   private String nombre=null;
+   private String ruta="Agenda.txt";
+   private DefaultListModel<String> model = new DefaultListModel<>(); 
+   private Agenda agen=new Agenda(ruta);
    private DefaultListModel modelList() throws FileNotFoundException {
        
-      
-        Agenda agen=new Agenda("C:\\Users\\kanutto\\Documents\\NetBeansProjects\\AGENDA\\Agenda.txt");
-               
-        
         for(Contacto c:agen.getListaContactos()){
            model.addElement(c.getNombre());
         }
@@ -42,13 +43,21 @@ public class JframeInicio extends javax.swing.JFrame {
         return model;
     }
    
-   public String getNombre(){
-       return nombre;
-   }
+  
    
     public JframeInicio() throws FileNotFoundException   {
         initComponents();
-      
+        this.setVisible(true);
+        this.setExtendedState(6);
+        jListContactos.setModel(modelList());
+       
+    
+    }
+    public JframeInicio(Agenda agend) throws FileNotFoundException   {
+        initComponents();
+        this.setVisible(true);
+        this.setExtendedState(6);
+        this.agen=agend;
         jListContactos.setModel(modelList());
        
     
@@ -68,10 +77,13 @@ public class JframeInicio extends javax.swing.JFrame {
         jButtonSelect = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jButtonAñadir = new javax.swing.JButton();
-        jButtonBuscar = new javax.swing.JButton();
         jButtonExportar = new javax.swing.JButton();
         jButtonImportar = new javax.swing.JButton();
         jLabelLogo = new javax.swing.JLabel();
+        jTextFieldBuscar = new javax.swing.JTextField();
+        jButtonEliminar = new javax.swing.JButton();
+        jButtonEliminarTodo = new javax.swing.JButton();
+        jLabelBuscar = new javax.swing.JLabel();
         jLabelFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -79,47 +91,89 @@ public class JframeInicio extends javax.swing.JFrame {
 
         jScrollPane1.setForeground(new java.awt.Color(204, 204, 255));
 
-        jListContactos.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jListContactos.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jScrollPane1.setViewportView(jListContactos);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 270, 530, 240));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 310, 530, 240));
 
         jButtonSelect.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jButtonSelect.setText("Select");
-        jButtonSelect.setPreferredSize(new java.awt.Dimension(109, 37));
+        jButtonSelect.setMaximumSize(new java.awt.Dimension(137, 37));
+        jButtonSelect.setMinimumSize(new java.awt.Dimension(137, 37));
+        jButtonSelect.setPreferredSize(new java.awt.Dimension(137, 37));
         jButtonSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 440, 110, -1));
+        getContentPane().add(jButtonSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 320, 140, -1));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel1.setText("Contactos:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 220, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 270, -1, -1));
 
         jButtonAñadir.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jButtonAñadir.setText("Añadir");
-        getContentPane().add(jButtonAñadir, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 300, 110, -1));
-
-        jButtonBuscar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButtonBuscar.setText("Buscar");
-        jButtonBuscar.setPreferredSize(new java.awt.Dimension(109, 37));
-        getContentPane().add(jButtonBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 370, -1, -1));
+        jButtonAñadir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAñadirActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonAñadir, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 270, 140, -1));
 
         jButtonExportar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButtonExportar.setText("Exportar");
-        getContentPane().add(jButtonExportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 540, -1, -1));
+        jButtonExportar.setText("<html><p align=\"center\">Exportar</p><p align=\"center\">.csv</p></html>");
+        jButtonExportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonExportarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonExportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 420, -1, -1));
 
         jButtonImportar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButtonImportar.setText("Importar");
-        getContentPane().add(jButtonImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 540, -1, -1));
+        jButtonImportar.setText("<html><p align=\"center\">Importar</p><p align=\"center\">.csv</p></html>");
+        jButtonImportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonImportarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 500, -1, -1));
 
         jLabelLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo1.png"))); // NOI18N
         getContentPane().add(jLabelLogo, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, -1, -1));
 
+        jTextFieldBuscar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jTextFieldBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextFieldBuscarKeyReleased(evt);
+            }
+        });
+        getContentPane().add(jTextFieldBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 220, 530, -1));
+
+        jButtonEliminar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jButtonEliminar.setText("Eliminar");
+        jButtonEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEliminarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 370, 140, -1));
+
+        jButtonEliminarTodo.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonEliminarTodo.setText("Eliminar Todo");
+        jButtonEliminarTodo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEliminarTodoActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonEliminarTodo, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 570, -1, -1));
+
+        jLabelBuscar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabelBuscar.setText("Buscar:");
+        getContentPane().add(jLabelBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 180, -1, -1));
+
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/62863877-red-white-wallpapers.jpg"))); // NOI18N
-        getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, -1));
+        getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -128,17 +182,121 @@ public class JframeInicio extends javax.swing.JFrame {
       int pos=jListContactos.getSelectedIndex();
       nombre=model.get(pos);
       System.out.println(nombre);
+      Contacto co=agen.buscarContacto(nombre);
+      JframeContacto nuevaVentana;
         try {
-            JframeContacto nuevaVentana= new JframeContacto();
-            nuevaVentana.setJlabel(nombre);
-            nuevaVentana.modelList(nombre);
+            nuevaVentana = new JframeContacto(co,ruta);
             nuevaVentana.setVisible(true);
-            JframeInicio.this.dispose();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
         }
+     
+      
+      JframeInicio.this.dispose();
         
     }//GEN-LAST:event_jButtonSelectActionPerformed
+
+    private void jButtonAñadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAñadirActionPerformed
+       
+       try {
+           JframeAñadir nuevaVentana = new JframeAñadir(ruta);
+           nuevaVentana.setVisible(true);
+       } catch (FileNotFoundException ex) {
+           Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
+       }
+       JframeInicio.this.dispose();
+        
+    }//GEN-LAST:event_jButtonAñadirActionPerformed
+
+    private void jButtonEliminarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminarTodoActionPerformed
+     int n = JOptionPane.showConfirmDialog( null,"¿Estás seguro que desea eliminarlos?" ,"Eliminar Todos los Contactos", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+     if(n==JOptionPane.YES_OPTION){
+      agen.Vaciar();
+      model.removeAllElements();
+      jListContactos.setModel(model);
+       try {
+           agen.guardarDatos();
+       } catch (IOException ex) {
+           Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
+       }
+     }
+       
+    }//GEN-LAST:event_jButtonEliminarTodoActionPerformed
+
+    private void jButtonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminarActionPerformed
+     int n = JOptionPane.showConfirmDialog( null,"¿Estás seguro que desea eliminar?" ,"Eliminar Contacto", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+     if(n==JOptionPane.YES_OPTION){
+        int i=jListContactos.getSelectedIndex();
+        agen.EliminarContacto(model.get(i));
+        model.remove(i);
+        jListContactos.setModel(model);
+          try {
+              agen.guardarDatos();
+          } catch (IOException ex) {
+              Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
+          }
+     }
+    }//GEN-LAST:event_jButtonEliminarActionPerformed
+
+    private void jButtonImportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportarActionPerformed
+        JFileChooser file=new JFileChooser();
+        file.showOpenDialog(this);
+        File abre=file.getSelectedFile();
+         if(abre!=null) {     
+            try {
+                agen.importar(abre);
+                jListContactos.setModel(modelList());
+                agen.guardarDatos();
+            } catch (IOException ex) {
+                Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         }    
+  
+    }//GEN-LAST:event_jButtonImportarActionPerformed
+
+    private void jButtonExportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportarActionPerformed
+       try
+ {
+  String nombre="";
+  JFileChooser file=new JFileChooser();
+  int result = file.showSaveDialog(this);
+  File guarda =file.getSelectedFile();
+  
+
+if (result == JFileChooser.APPROVE_OPTION) {
+   agen.exportar(guarda);
+   JOptionPane.showMessageDialog(null,"El archivo se a guardado Exitosamente","Información",JOptionPane.INFORMATION_MESSAGE);
+} else if (result == JFileChooser.CANCEL_OPTION) {
+   JOptionPane.showMessageDialog(null,"El archivo no se ha guardado","Información",JOptionPane.INFORMATION_MESSAGE);
+}
+ 
+
+ }
+  catch(IOException ex)
+  {
+   JOptionPane.showMessageDialog(null,
+        "Su archivo no se ha guardado",
+           "Advertencia",JOptionPane.WARNING_MESSAGE);
+  }
+
+    }//GEN-LAST:event_jButtonExportarActionPerformed
+
+    private void jTextFieldBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldBuscarKeyReleased
+      if(jTextFieldBuscar.getText().equals("")){
+           try {
+               jListContactos.setModel(modelList());
+       } catch (FileNotFoundException ex) {
+           Logger.getLogger(JframeInicio.class.getName()).log(Level.SEVERE, null, ex);
+       }
+       }
+       else {
+            Contacto con= agen.buscarContacto(jTextFieldBuscar.getText());
+            model.removeAllElements();
+            model.addElement(con.getNombre());
+            jListContactos.setModel(model);
+       }
+           
+    }//GEN-LAST:event_jTextFieldBuscarKeyReleased
 
     /**
      * @param args the command line arguments
@@ -190,14 +348,17 @@ public class JframeInicio extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAñadir;
-    private javax.swing.JButton jButtonBuscar;
+    private javax.swing.JButton jButtonEliminar;
+    private javax.swing.JButton jButtonEliminarTodo;
     private javax.swing.JButton jButtonExportar;
     private javax.swing.JButton jButtonImportar;
     private javax.swing.JButton jButtonSelect;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelBuscar;
     private javax.swing.JLabel jLabelFondo;
     private javax.swing.JLabel jLabelLogo;
     private javax.swing.JList<String> jListContactos;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextFieldBuscar;
     // End of variables declaration//GEN-END:variables
 }
